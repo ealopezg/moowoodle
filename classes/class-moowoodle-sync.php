@@ -145,14 +145,30 @@ class MooWoodle_Sync {
 				}
 
 				$post_id = moowoodle_get_post_by_moodle_id( $course[ 'id' ], $post_type );
-
+				
 				$post_status = 'publish';
-				$args = array( 'post_title'   => $course[ 'fullname' ],
-							   'post_name'	  => $course[ 'shortname' ],
-							   'post_content' => $course[ 'summary' ],
-							   'post_status'  => $post_status,
-							   'post_type'    => $post_type							
-						    );
+
+				// Saves course program as custom field
+				$custom_fields = $course['customfields'];
+				$post_content = '';
+				$course_program = '';
+				foreach ($custom_fields as $custom_field) {
+					if ($custom_field['shortname'] == 'programa') {
+						$course_program = $custom_field['valueraw'];
+					}
+					if ($custom_field['shortname'] == 'descripcion') {
+						$post_content = $custom_field['valueraw'];
+					}
+				}
+				$args = array(
+					'post_title'   => $course['fullname'],
+					'post_name'	  => $course['shortname'],
+					'post_content' => $post_content,
+					'post_status'  => $post_status,
+					'post_type'    => $post_type,
+					'post_excerpt' => $course['summary']
+				);
+				
 
 				if ( $post_id > 0 ) {
 					$args[ 'ID' ] = $post_id;
@@ -169,6 +185,7 @@ class MooWoodle_Sync {
 						update_post_meta( $new_post_id, '_sold_individually', 'yes' );
 						update_post_meta( $new_post_id, '_course_startdate', $course[ 'startdate' ] );
 						update_post_meta( $new_post_id, '_course_enddate', $course[ 'enddate' ] );
+						update_post_meta( $new_post_id, '_course_program', $course_program);
 					} else {
 						$shortname = $course[ 'shortname' ];
 						update_post_meta( $new_post_id, '_course_short_name', sanitize_text_field( $shortname ) );
@@ -188,7 +205,7 @@ class MooWoodle_Sync {
 				$course_id = get_post_meta( $post->ID, 'moodle_course_id', true );
 				if ( array_key_exists( $course_id, $course_ids ) ) {
 					$term_id = moowoodle_get_term_by_moodle_id( $course_ids[ $course_id ], $taxonomy, $meta_key );
-					wp_set_post_terms( $post->ID, $term_id, $taxonomy );					
+					wp_set_post_terms( $post->ID, $term_id, $taxonomy );
 				} else if ( ! empty( $course_id ) ) {
 					wp_delete_post( $post->ID, false );					
 				}

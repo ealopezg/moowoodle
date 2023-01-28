@@ -204,14 +204,14 @@ if( ! function_exists( 'get_moowoodle_course_url' ) ) {
   function get_moowoodle_course_url( $linked_course_id, $course_name ) {
     global $MooWoodle;
     $course = $linked_course_id;
-    $class = 'moowoodle';
+    $class = 'btn btn-primary';
     $target = '_blank';
     $authtext = '';
     $activity = 0;
-    $content = $course_name;
+    $content = $course_name. ' <i class="fas fa-eye"></i>';
     $conn_settings = $MooWoodle->options_general_settings;
     $redirect_uri = $conn_settings[ 'moodle_url' ] . "/course/view.php?id=" . $course;
-    $url = '<a target="' . esc_attr( $target ) . '" class="' . esc_attr( $class ) . '" href="' . $redirect_uri . '">' . $content . '</a>';
+    $url = '<a role="button" target="' . esc_attr( $target ) . '" class="' . esc_attr( $class ) . '" href="' . $redirect_uri . '">' . $content . '</a>';
     return $url;
   }
 }

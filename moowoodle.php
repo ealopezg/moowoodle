@@ -77,3 +77,37 @@ function remove_update_notification($value)
 	unset($value->response[plugin_basename(__FILE__)]);
 	return $value;
 }
+
+// Adds course program
+
+
+function filter_woocommerce_product_tabs($tabs)
+{
+	// Get the global product object
+	global $product;
+
+	// Is a WC product
+	if (is_a($product, 'WC_Product')) {
+		// Get type
+		$tabs['course_program'] = array(
+			'title'     => 'Programa del curso',
+			'priority'  => 50,
+			'callback'  => 'woo_new_product_tab_content'
+		);
+	} else {
+		echo 'NOT a WC product';
+	}
+
+	return $tabs;
+}
+add_filter('woocommerce_product_tabs', 'filter_woocommerce_product_tabs', 10, 1);
+
+// Callback
+function woo_new_product_tab_content()
+{
+	global $post;
+	$course_program = get_post_meta($post->ID, '_course_program', 1);
+	if (!empty($course_program)) {
+		echo $course_program;
+	}
+}
